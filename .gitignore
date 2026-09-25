@@ -7,3 +7,6 @@ media-originals/
 # Vercel project link (created by the Vercel CLI)
 .vercel
 .env*
+
+# Portfolio screenshots and copy (kept locally)
+portfolio-kit/
