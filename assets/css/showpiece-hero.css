@@ -1,0 +1,193 @@
+/* ==========================================================================
+   SHOWPIECE 1 — "Halo Light" hero
+   --------------------------------------------------------------------------
+   Content (eyebrow, headline, text, buttons, specs, video) lives in the HTML.
+   assets/js/showpiece-hero.js adds behaviour only:
+     · splits .hero-headline into words for a staggered reveal
+     · plays .hero-video on larger screens (poster image elsewhere)
+     · draws the pointer-following ring of light on a <canvas> it creates
+   Ring colours are read from --halo-glow / --halo-core below.
+   In Elementor: this block goes in an HTML widget (or Custom CSS) on the hero container.
+   ========================================================================== */
+
+.hero {
+  --halo-glow: #22E07A;
+  --halo-core: #EFFFF6;
+  --hero-scroll: 0;
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 150px var(--gutter) 110px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-ink);
+}
+
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  transform: scale(calc(1.04 + var(--hero-scroll) * 0.08));
+  transform-origin: 70% 50%;
+  will-change: transform;
+}
+
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 50%;
+}
+
+/* legibility gradient (Elementor: background overlay) */
+.hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(7, 17, 12, 0.94) 0%, rgba(7, 17, 12, 0.72) 30%, rgba(7, 17, 12, 0.1) 62%, rgba(7, 17, 12, 0) 100%),
+    linear-gradient(0deg, var(--color-ink) 0%, rgba(7, 17, 12, 0) 26%),
+    linear-gradient(180deg, rgba(7, 17, 12, 0.55) 0%, rgba(7, 17, 12, 0) 20%);
+}
+
+/* created by showpiece-hero.js */
+.hero-halo-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: calc(1 - var(--hero-scroll) * 1.6);
+}
+
+.hero-content {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  transform: translateY(calc(var(--hero-scroll) * -70px));
+}
+
+.hero-eyebrow { color: var(--color-primary); }
+
+.hero-headline {
+  max-width: 11.5ch;
+  font-size: clamp(2.7rem, 6.6vw, 6.4rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+
+.hero-headline-accent {
+  color: var(--color-primary);
+  text-shadow: 0 0 42px rgba(34, 224, 122, 0.45);
+}
+
+.hero-subheading {
+  max-width: 46ch;
+  font-size: clamp(1.05rem, 1.35vw, 1.22rem);
+  line-height: 1.6;
+  color: rgba(236, 241, 236, 0.8);
+}
+
+.hero-buttons { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.hero-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-line);
+}
+
+.hero-spec {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ---- Word-by-word reveal (spans are generated from the existing headline text) ---- */
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.04em 0.02em 0.1em;
+  margin: -0.04em -0.02em -0.1em;
+}
+
+.hero-word-inner { display: inline-block; }
+
+.hero.is-settled .hero-word { overflow: visible; }
+
+.hero.has-intro .hero-word-inner {
+  transform: translateY(110%);
+  transition: transform 1.15s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 85ms + 180ms);
+}
+
+.hero.has-intro .hero-eyebrow,
+.hero.has-intro .hero-subheading,
+.hero.has-intro .hero-buttons,
+.hero.has-intro .hero-specs {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 1s var(--ease-out), transform 1s var(--ease-out);
+}
+
+.hero.has-intro .hero-eyebrow { transition-delay: 0.05s; }
+.hero.has-intro .hero-subheading { transition-delay: 0.75s; }
+.hero.has-intro .hero-buttons { transition-delay: 0.9s; }
+.hero.has-intro .hero-specs { transition-delay: 1.05s; }
+
+.hero.has-intro .hero-media { opacity: 0; transition: opacity 1.6s ease; }
+
+.hero.is-ready .hero-word-inner,
+.hero.is-ready .hero-eyebrow,
+.hero.is-ready .hero-subheading,
+.hero.is-ready .hero-buttons,
+.hero.is-ready .hero-specs { opacity: 1; transform: none; }
+
+.hero.is-ready .hero-media { opacity: 1; }
+
+/* ---- Tablet / mobile: car sits above, copy anchors to the bottom ---- */
+@media (max-width: 1024px) {
+  .hero { align-items: flex-end; padding-bottom: 72px; }
+  .hero-video { object-position: 72% 50%; }
+  .hero-media::after {
+    background:
+      linear-gradient(0deg, var(--color-ink) 4%, rgba(7, 17, 12, 0.82) 42%, rgba(7, 17, 12, 0.15) 75%, rgba(7, 17, 12, 0.5) 100%);
+  }
+}
+
+@media (max-width: 767px) {
+  /* phones: car sits in the top half, copy starts beneath it */
+  .hero {
+    min-height: 0;
+    align-items: flex-start;
+    padding-top: 50svh;
+    padding-bottom: 56px;
+  }
+  .hero-media { bottom: auto; height: 64svh; transform: none; }
+  .hero-video { object-position: 78% 50%; }
+  .hero-media::after {
+    background:
+      linear-gradient(0deg, var(--color-ink) 0%, var(--color-ink) 5%, rgba(7, 17, 12, 0.6) 26%, rgba(7, 17, 12, 0) 50%),
+      linear-gradient(180deg, rgba(7, 17, 12, 0.9) 0%, rgba(7, 17, 12, 0.5) 14%, rgba(7, 17, 12, 0) 30%);
+  }
+  .hero-content { gap: 22px; }
+  .hero-buttons { width: 100%; }
+  .hero-buttons .btn { flex: 1 1 200px; }
+  .hero-specs { margin-top: 12px; gap: 8px 18px; }
+  .hero-spec { font-size: 0.64rem; letter-spacing: 0.18em; }
+}

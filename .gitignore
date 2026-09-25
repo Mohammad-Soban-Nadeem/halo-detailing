@@ -1,0 +1,5 @@
+# Full-resolution AI originals (not used by the website; kept locally)
+media-originals/
+
+# macOS
+.DS_Store

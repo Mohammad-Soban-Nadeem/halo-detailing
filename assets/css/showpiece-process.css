@@ -1,0 +1,152 @@
+/* ==========================================================================
+   SHOWPIECE 3 — "The Halo Process" scroll sequence
+   --------------------------------------------------------------------------
+   Content: each .process-step holds its own .process-step-number, -title,
+   -text and -image in the HTML. With no JS (and on tablet/mobile) the steps
+   render as a clean stacked list.
+   assets/js/showpiece-process.js (desktop only) moves each step's image into
+   a sticky stage it creates, reveals the active photo with a circular "halo"
+   wipe, and fills a progress line. Add a step in the markup and it joins in.
+   ========================================================================== */
+
+.process-track {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.process-steps {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.process-step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.process-step-number {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5.25rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: rgba(236, 241, 236, 0.16);
+  transition: color 0.6s var(--ease-out), text-shadow 0.6s;
+}
+
+.process-step-title { font-size: clamp(1.5rem, 2.6vw, 2.3rem); letter-spacing: -0.025em; }
+
+.process-step-text { max-width: 46ch; color: var(--color-muted); font-size: 1.05rem; }
+
+.process-step-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  margin-top: 8px;
+  border-radius: var(--radius);
+}
+
+/* ---- Enhanced (desktop + JS) ---- */
+.process.is-enhanced .process-steps { gap: 0; padding-left: 56px; }
+
+.process.is-enhanced .process-step {
+  min-height: 74vh;
+  justify-content: center;
+  opacity: 0.26;
+  transition: opacity 0.7s var(--ease-out);
+}
+
+.process.is-enhanced .process-step.is-active { opacity: 1; }
+
+.process.is-enhanced .process-step.is-active .process-step-number {
+  color: var(--color-primary);
+  text-shadow: 0 0 44px rgba(34, 224, 122, 0.45);
+}
+
+/* progress line + travelling halo (created by JS) */
+.process-progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--color-line);
+}
+
+.process-progress-bar {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--color-accent), var(--color-primary));
+  box-shadow: 0 0 14px rgba(34, 224, 122, 0.8);
+  transform-origin: top;
+  transform: scaleY(var(--process-progress, 0));
+}
+
+.process-progress::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(var(--process-progress, 0) * 100%);
+  width: 22px;
+  height: 8px;
+  border: 1.5px solid var(--color-accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 14px rgba(34, 224, 122, 0.9), inset 0 0 6px rgba(34, 224, 122, 0.6);
+}
+
+/* sticky stage (created by JS) */
+.process-stage {
+  position: sticky;
+  top: 13vh;
+  flex: 1.15 1 0;
+  min-width: 0;
+  height: 74vh;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: 0 60px 120px -60px rgba(34, 224, 122, 0.35);
+}
+
+.process-stage-frame {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path 1.2s var(--ease-out);
+}
+
+.process-stage-frame.is-shown { clip-path: circle(75% at 50% 50%); }
+
+.process-stage-frame .process-step-image {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  margin: 0;
+  border-radius: 0;
+  transform: scale(1.14);
+  transition: transform 1.8s var(--ease-out);
+}
+
+.process-stage-frame.is-shown .process-step-image { transform: scale(1); }
+
+.process-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(0deg, rgba(7, 17, 12, 0.75) 0%, rgba(7, 17, 12, 0) 38%);
+}
+
+
+@media (max-width: 1024px) {
+  .process-track { flex-direction: column; }
+  .process-steps { gap: 64px; }
+}
