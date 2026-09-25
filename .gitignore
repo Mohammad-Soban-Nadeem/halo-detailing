@@ -3,3 +3,7 @@ media-originals/
 
 # macOS
 .DS_Store
+
+# Vercel project link (created by the Vercel CLI)
+.vercel
+.env*
